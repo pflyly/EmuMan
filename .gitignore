@@ -40,3 +40,6 @@ downloads/
 *.swp
 *.swo
 
+
+# Binaries
+upx.exe
