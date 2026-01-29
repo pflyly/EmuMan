@@ -1,8 +1,8 @@
-name: Build Windows EXE
+name: Build Windows
 
 on:
   pull_request:
-    branches: [ "master", "main" ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
