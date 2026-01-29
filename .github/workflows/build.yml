@@ -27,7 +27,6 @@ jobs:
     - name: Setup UPX
       uses: crazy-max/ghaction-upx@v3
       with:
-        install: true
         version: latest
 
     - name: Build with PyInstaller
