@@ -31,15 +31,6 @@
 
 ---
 
-## 📸 Preview
-
-*(It is recommended to add actual project screenshots here, for example:)*
-| Home Dashboard | Toolbox | Settings |
-| :---: | :---: | :---: |
-| ![Home](https://via.placeholder.com/200x120?text=Home+UI) | ![Toolbox](https://via.placeholder.com/200x120?text=Toolbox+UI) | ![Settings](https://via.placeholder.com/200x120?text=Settings+UI) |
-
----
-
 ## 🚀 Quick Start
 
 ### Option 1: Run from Source (Recommended for Developers)
@@ -78,21 +69,9 @@ Please visit the [Releases](https://github.com/your-username/EmuMan/releases) pa
 - [x] Multi-language UI support
 - [x] Automatic sync for multiple emulator versions
 - [x] One-click firmware/keys installation
-- [/] More intelligent Mod management (In progress...)
+- [ ] More intelligent Mod management (In progress...)
 - [ ] Cloud save synchronization (Planned)
 - [ ] Game library management (In design)
-
----
-
-## 🤝 Contributing
-
-Any form of contribution is welcome, whether it's fixing bugs, adding new features, or improving documentation.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ---
 
@@ -104,5 +83,5 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for more informati
 
 <div align="center">
   <p>If you find EmuMan helpful, please give us a ⭐️!</p>
-  <p>Copyright © 2024 EmuMan Team</p>
+  <p>Copyright © 2026 EmuMan </p>
 </div>
