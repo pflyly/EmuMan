@@ -39,6 +39,10 @@ class FileProcessor(QObject):
         """Apply chmod +x to a specific file on Linux/Unix systems."""
         if sys.platform == "win32": return
         try:
+            # Idempotency check: if already executable, skip
+            if os.access(path, os.X_OK):
+                return True
+                
             logger.info(f"Linux: Applying executable permission to {path}")
             st = os.stat(path)
             os.chmod(path, st.st_mode | stat.S_IEXEC)
