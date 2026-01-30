@@ -69,11 +69,10 @@ class KeysManager:
         candidates = []
         roaming = Path(os.getenv('APPDATA')) if os.name == 'nt' else Path.home() / ".config"
         
-        # Common paths for Yuzu/Ryujinx
+        # Eden paths
         search_paths = [
-            roaming / "yuzu" / "keys",
-            roaming / "Ryujinx" / "system",
-            roaming / "suyu" / "keys",
+            roaming / "eden" / "keys",
+            Path.home() / ".local" / "share" / "eden" / "keys",
         ]
         
         found_files = []

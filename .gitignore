@@ -32,6 +32,7 @@ api_cache.json
 cache/
 backups/
 downloads/
+upx/
 
 # IDEs
 .idea/
@@ -39,7 +40,3 @@ downloads/
 .cursor/
 *.swp
 *.swo
-
-
-# Binaries
-upx.exe

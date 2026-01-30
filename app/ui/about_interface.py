@@ -92,7 +92,7 @@ class AboutInterface(SingleDirectionScrollArea):
         components = [
             ("Eden Emulator", "https://git.eden-emu.dev/eden-emu/eden", "Core Switch Emulator"),
             ("Aria2", "https://github.com/aria2/aria2", "High speed download utility"),
-            ("QFluentWidgets", "https://qfluentwidgets.com/", "Modern UI Components"),
+            ("PyQt-Fluent-Widgets", "https://github.com/zhiyiYo/PyQt-Fluent-Widgets/tree/PySide6", "Modern UI Components"),
             ("NX Firmware", "https://github.com/THZoria/NX_Firmware", "Firmware Source"),
         ]
         

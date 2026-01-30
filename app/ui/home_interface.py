@@ -23,7 +23,7 @@ from app.core.cache_manager import CacheManager
 from app.core.app_updater import AppUpdater
 from app.core.firmware_manager import FirmwareManager
 from app.ui.components.channel_card import ChannelCard
-from app.utils.path_utils import get_resource_path
+from app.utils.path_utils import get_resource_path, open_directory
 
 class DownloadSelectionDialog(MessageBoxBase):
     def __init__(self, parent, title, items, best_index=0):
@@ -318,18 +318,25 @@ class HomeInterface(QFrame):
         eden_exe_path = self._get_current_eden_exe()
         data_path = FirmwareManager.get_user_data_path(eden_exe_path)
         
+        # Ensure path is absolute for safety
+        if data_path:
+            data_path = Path(data_path).resolve()
+        
         if data_path and data_path.exists():
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(data_path)))
+            success, msg = open_directory(str(data_path))
+            if not success:
+                 InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
         else:
             # Try to create it if system default
-            if not eden_exe_path: 
+            if not eden_exe_path and data_path: 
                  # System default assumption
-                 if not data_path.exists():
-                     try:
-                         data_path.mkdir(parents=True, exist_ok=True)
-                         QDesktopServices.openUrl(QUrl.fromLocalFile(str(data_path)))
-                         return
-                     except: pass
+                 try:
+                     data_path.mkdir(parents=True, exist_ok=True)
+                     success, msg = open_directory(str(data_path))
+                     if not success:
+                         InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
+                     return
+                 except: pass
             
             InfoBar.warning(
                 title=self.lang.get("user_folder_not_found", "Folder Not Found"),
@@ -340,20 +347,33 @@ class HomeInterface(QFrame):
 
     def open_eden_folder(self):
         """Open the configured Eden Emulator Download Folder"""
+        base_path = ""
         if os.path.exists("config.json"):
             try:
                 with open("config.json", 'r', encoding='utf-8') as f:
                     base_path = json.load(f).get("path", "")
-                
-                if base_path and os.path.exists(base_path):
-                    QDesktopServices.openUrl(QUrl.fromLocalFile(base_path))
-                    return
             except Exception: pass
         
-        # Fallback
+        # Fallback to default if not configured
+        if not base_path:
+            base_path = os.path.join(os.getcwd(), "downloads", "eden")
+            
+        if base_path:
+            # Create if missing (user expectation: "Open MY folder")
+            if not os.path.exists(base_path):
+                try: os.makedirs(base_path, exist_ok=True)
+                except: pass
+                
+            if os.path.exists(base_path):
+                success, msg = open_directory(base_path)
+                if not success:
+                    InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
+                return
+        
+        # Fallback error (Should technically be unreachable if creation works)
         InfoBar.warning(
             title=self.lang.get("file_not_found", "File Not Found"),
-            content="Eden Emulator path not configured.",
+            content="Eden Emulator path invalid.",
             parent=self
         ) 
 

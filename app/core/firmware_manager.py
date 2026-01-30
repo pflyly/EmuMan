@@ -130,6 +130,8 @@ class FirmwareManager(QObject):
             
         return results
 
+
+
     @staticmethod
     def get_firmware_version(eden_exe_path=None):
         """
@@ -141,20 +143,13 @@ class FirmwareManager(QObject):
         log_time = 0
         
         log_paths = []
-        if eden_exe_path and os.path.exists(eden_exe_path):
-            exe_dir = Path(eden_exe_path).parent
-            portable_log = exe_dir / "user" / "log" / "eden_log.txt"
-            log_paths.append(portable_log)
+        user_dir = FirmwareManager.get_user_data_path(eden_exe_path)
         
-        if sys.platform == "win32":
-            system_log = Path.home() / "AppData" / "Roaming" / "eden" / "log" / "eden_log.txt"
-        else:
-            xdg_data_home = os.getenv("XDG_DATA_HOME")
-            if xdg_data_home:
-                system_log = Path(xdg_data_home) / "eden" / "log" / "eden_log.txt"
-            else:
-                system_log = Path.home() / ".local" / "share" / "eden" / "log" / "eden_log.txt"
+        # Determine portable log path if applicable (it resides in user/log)
+        # However _get_base_user_dir returns the 'user' or equivalent root.
+        # Log is at <root>/log/eden_log.txt
         
+        system_log = user_dir / "log" / "eden_log.txt"
         log_paths.append(system_log)
         
         for log_path in log_paths:
@@ -449,24 +444,8 @@ class FirmwareManager(QObject):
         2. System (Win): %APPDATA%/eden/nand/system/Contents/registered/
         3. System (Linux): ~/.local/share/eden/nand/system/Contents/registered/
         """
-        if eden_exe_path and os.path.exists(eden_exe_path):
-            path_obj = Path(eden_exe_path)
-            # If input is directory (from settings), use it as exe_dir; if file (exe), use parent
-            exe_dir = path_obj if path_obj.is_dir() else path_obj.parent
-            
-            # Check for Portable Mode (check 'user' folder)
-            if (exe_dir / "user").exists():
-                return exe_dir / "user" / "nand" / "system" / "Contents" / "registered"
-
-        # System Mode Fallback
-        if sys.platform == "win32":
-            return Path.home() / "AppData" / "Roaming" / "eden" / "nand" / "system" / "Contents" / "registered"
-        else:
-            xdg_data_home = os.getenv("XDG_DATA_HOME")
-            if xdg_data_home:
-                return Path(xdg_data_home) / "eden" / "nand" / "system" / "Contents" / "registered"
-            else:
-                return Path.home() / ".local" / "share" / "eden" / "nand" / "system" / "Contents" / "registered"
+        user_dir = FirmwareManager.get_user_data_path(eden_exe_path)
+        return user_dir / "nand" / "system" / "Contents" / "registered"
 
     @staticmethod
     def get_user_data_path(eden_exe_path=None):
@@ -486,11 +465,15 @@ class FirmwareManager(QObject):
         if sys.platform == "win32":
             return Path.home() / "AppData" / "Roaming" / "eden"
         else:
-            xdg_data_home = os.getenv("XDG_DATA_HOME")
-            if xdg_data_home:
-                return Path(xdg_data_home) / "eden"
-            else:
-                return Path.home() / ".local" / "share" / "eden"
+            default_linux = Path.home() / ".local" / "share" / "eden"
+            if default_linux.exists():
+                return default_linux
+            
+            xdg = os.getenv("XDG_DATA_HOME")
+            if xdg:
+                return Path(xdg) / "eden"
+            
+            return default_linux
 
     @staticmethod
     def install_firmware(zip_path, eden_exe_path=None, progress_callback=None, cancel_check=None, version_tag=None):
