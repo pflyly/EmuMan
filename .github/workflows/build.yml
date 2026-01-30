@@ -67,6 +67,10 @@ jobs:
   release:
     name: Release
     needs: build
+    permissions:
+      actions: read
+      security-events: write
+      contents: write
     runs-on: ubuntu-latest
     if: github.ref_name == 'main'
     
@@ -109,5 +113,3 @@ jobs:
         files: |
           release_dist/EmuMan-Windows.exe
           release_dist/EmuMan-Linux
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
