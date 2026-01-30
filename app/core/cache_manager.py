@@ -88,6 +88,7 @@ class SyncWorker(QThread):
                         end_idx = body.find("##", start_idx + 5)
                         clean_body = body[start_idx:end_idx].strip() if end_idx != -1 else body[start_idx:].strip()
                     
+                    clean_body = clean_body.replace("**\n", "**\n\n")
                     res_data["changelogs"]["nightly"][tag] = clean_body
         except Exception as e:
             fetch_log_success = False
