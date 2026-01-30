@@ -16,18 +16,18 @@
 **EmuMan** (Emulator Manager) is a helper utility specifically designed for the Eden Emulator. It addresses common pain points such as frequent emulator updates, complex firmware management, and difficult save data backups by providing a one-stop maintenance solution for players.
 
 > [!TIP]
-> Whether you are a player seeking stability or a developer who enjoys testing the latest features, EmuMan helps you effortlessly switch between different emulator branches while keeping your saves and settings safe.
+> **Stay Informed & Secure**: EmuMan puts the latest Eden changelogs front and center, so you always know what's new. Whether you're chasing the latest features or sticking to stability, switch branches effortlessly while keeping your saves safe.
 
 ---
 
 ## ✨ Core Features
 
 - 🚀 **Multi-Version Management**: Automatic downloading, installation, and quick switching between Master (Stable) and Nightly (Dev) branches.
-- 📦 **Firmware & Keys Management**: Automatically sync the latest firmware or install local files. One-click scanning and importing for `prod.keys` and `title.keys`.
-- 🛡️ **Safe Backup**: Integrated "Save Manager" with multi-point backup and restore functionality—never worry about losing saves during updates again.
+- 📦 **Firmware & Keys Management**: Automatically sync the latest firmware or install local files. One-click scanning and importing for `*.keys`.
+- 🛡️ **Safe Backup**: Integrated "Save Manager" with multi-point backup and restore functionality—never worry about losing saves during updates.
 - 🛠️ **Toolbox**: Useful utilities including log exporting and Mod (LayeredFS) toggle management.
 - 🌍 **Multi-Language Support**: Native support for English, Chinese (Simplified/Traditional), Japanese, Korean, and more.
-- 🎨 **Modern UI**: A high-quality native interface built with PySide6, featuring smooth Light/Dark mode transitions.
+- 🎨 **Modern UI**: A high-quality native interface built with [PySide6-Fluent-Widgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets/tree/PySide6), featuring smooth Light/Dark mode transitions.
 
 ---
 
@@ -35,43 +35,42 @@
 
 ### Option 1: Run from Source (Recommended for Developers)
 
-1. **Clone the Repo**:
+1. **Prerequisites (Linux Only)**:
    ```bash
-   git clone https://github.com/your-username/EmuMan.git
+   # Debian/Ubuntu
+   sudo apt install aria2 python3-venv python3-pip
+   # Arch Linux
+   sudo pacman -S aria2 python-pip
+   ```
+
+2. **Clone the Repo**:
+   ```bash
+   git clone https://github.com/pflyly/EmuMan.git
    cd EmuMan
    ```
 
-2. **Create and Activate Virtual Environment**:
+3. **Create and Activate Virtual Environment**:
    ```bash
    python -m venv .venv
    # Windows
    .venv\Scripts\activate
+   # Linux/macOS
+   source .venv/bin/activate
    ```
 
-3. **Install Dependencies**:
+4. **Install Dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Launch Application**:
+5. **Launch Application**:
    ```bash
    python main.py
    ```
 
 ### Option 2: Run Pre-compiled Version (Coming Soon)
 
-Please visit the [Releases](https://github.com/your-username/EmuMan/releases) page to download the latest `.exe` installer.
-
----
-
-## 📅 Roadmap
-
-- [x] Multi-language UI support
-- [x] Automatic sync for multiple emulator versions
-- [x] One-click firmware/keys installation
-- [ ] More intelligent Mod management (In progress...)
-- [ ] Cloud save synchronization (Planned)
-- [ ] Game library management (In design)
+Please visit the [Releases](https://github.com/pflyly/EmuMan/releases) page to download the latest `.exe` installer.
 
 ---
 

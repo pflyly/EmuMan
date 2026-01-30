@@ -24,6 +24,7 @@ from app.core.backup_manager import BackupManager
 from app.core.keys_manager import KeysManager
 from app.core.mod_manager import ModManager
 from app.core.firmware_manager import FirmwareManager, FirmwareInstallWorker, FirmwareUpdateCheckWorker
+from app.utils.path_utils import open_directory
 
 
 class RestoreDialog(MessageBoxBase):
@@ -238,7 +239,9 @@ class ModManagerDialog(MessageBoxBase):
     def open_folder(self):
         ModManager.open_mod_folder(self.get_eden_exe())
         if path := ModManager.get_load_dir(self.get_eden_exe()):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
+            success, msg = open_directory(str(path))
+            if not success:
+                InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
 
     def show_context_menu(self, pos):
         item = self.tree.itemAt(pos)
@@ -787,7 +790,9 @@ class ToolsInterface(QFrame):
     def open_mod_folder(self):
         path = ModManager.get_load_dir(self._get_eden_exe())
         if path and path.exists():
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
+            success, msg = open_directory(str(path))
+            if not success:
+                InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
         else:
             InfoBar.warning(title=self.lang.get("not_found", "Not Found"), content=str(path), parent=self)
 
@@ -907,12 +912,14 @@ class ToolsInterface(QFrame):
     def open_firmware_folder(self):
         path = FirmwareManager.get_firmware_path_config()
         if os.path.exists(path):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+            success, msg = open_directory(path)
+            if not success: InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
         else:
             # Create if not exists?
             try:
                 os.makedirs(path, exist_ok=True)
-                QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+                success, msg = open_directory(path)
+                if not success: InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
             except:
                 InfoBar.warning(title=self.lang.get("not_found", "Not Found"), content=str(path), parent=self)
 
@@ -964,7 +971,8 @@ class ToolsInterface(QFrame):
     def open_backup_folder(self):
         root = BackupManager.get_backup_root()
         if root.exists():
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(root)))
+            success, msg = open_directory(str(root))
+            if not success: InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
         else:
             InfoBar.warning(title=self.lang.get("not_found", "Not Found"), content=str(root), parent=self)
 
@@ -1060,7 +1068,8 @@ class ToolsInterface(QFrame):
                  except: pass
              
              if path.exists():
-                 QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
+                 success, msg = open_directory(str(path))
+                 if not success: InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
              else:
                  InfoBar.warning(self.lang.get("error", "Error"), self.lang.get("create_folder_fail", "Could not create folder: {}").format(path), parent=self)
     def get_eden_log_dir(self):
@@ -1075,7 +1084,8 @@ class ToolsInterface(QFrame):
         if not log_dir.exists():
             try: log_dir.mkdir(parents=True, exist_ok=True)
             except: pass
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(log_dir)))
+        success, msg = open_directory(str(log_dir))
+        if not success: InfoBar.error(title=self.lang.get("error", "Error"), content=msg, parent=self)
 
     def export_logs(self):
         log_dir = self.get_eden_log_dir()

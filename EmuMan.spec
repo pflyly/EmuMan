@@ -1,4 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
+import shutil
+import sys
+import os
 
 block_cipher = None
 
@@ -19,10 +22,19 @@ a = Analysis(
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# Define Aria2 Path based on OS
+aria2_filename = 'aria2c.exe' if sys.platform == 'win32' else 'aria2c'
+aria2_path = os.path.join('resources', 'bin', aria2_filename)
+aria2_binary = []
+
+if os.path.exists(aria2_path):
+    # Bundle it to the root of the frozen app (sys._MEIPASS/aria2c)
+    aria2_binary = [(aria2_filename, aria2_path, 'BINARY')]
+
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
+    a.binaries + aria2_binary,
     a.zipfiles,
     a.datas,
     [],
@@ -30,8 +42,8 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
-    upx_exclude=[],
+    upx=(sys.platform == 'win32'),
+    upx_exclude=['_uuid.pyd', 'vcruntime140.dll', 'python3.dll', 'python312.dll'],
     runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,

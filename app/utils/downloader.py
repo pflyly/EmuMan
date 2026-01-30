@@ -61,29 +61,50 @@ class Downloader:
     @staticmethod
     def get_aria2_executable():
         """Get path to aria2c executable, handling both dev and frozen environments."""
-        # 1. Check system path
+        exe_name = "aria2c.exe" if sys.platform == "win32" else "aria2c"
+        
+        # 1. Check bundled resources (Prioritize bundled for consistency)
+        if getattr(sys, 'frozen', False):
+            # PyInstaller One-file: sys._MEIPASS
+            base_path = Path(sys._MEIPASS)
+            
+            if sys.platform == "win32":
+                 candidates = [
+                    base_path / exe_name,
+                    base_path / "resources" / "bin" / exe_name
+                ]
+            else:
+                # Linux: Only check root (where we bundled system aria2c)
+                candidates = [
+                    base_path / exe_name
+                ]
+        else:
+            # Dev environment
+            base_path = Path.cwd()
+            if sys.platform == "win32":
+                candidates = [
+                    base_path / "resources" / "bin" / exe_name
+                ]
+            else:
+                # Linux Dev: Check resources/bin as well
+                candidates = [
+                    base_path / "resources" / "bin" / exe_name
+                ]
+
+        for bundled in candidates:
+            if bundled.exists():
+                # Linux: Ensure executable permission
+                if sys.platform != "win32" and not os.access(bundled, os.X_OK):
+                    try:
+                        os.chmod(bundled, 0o755)
+                        logger.info(f"Granted executable permission to {bundled}")
+                    except Exception as e:
+                        logger.warning(f"Failed to chmod {bundled}: {e}")
+                return str(bundled)
+
+        # 2. Fallback to system path
         if shutil.which("aria2c"):
             return "aria2c"
-        
-        # 2. Check bundled resources
-        # If frozen (PyInstaller), resources are usually extracted to sys._MEIPASS
-        if getattr(sys, 'frozen', False):
-            base_path = Path(sys._MEIPASS)
-        else:
-            base_path = Path.cwd()
-            
-        exe_name = "aria2c.exe" if sys.platform == "win32" else "aria2c"
-        bundled = base_path / "resources" / "bin" / exe_name
-        
-        if bundled.exists():
-            # Linux: Ensure executable permission
-            if sys.platform != "win32" and not os.access(bundled, os.X_OK):
-                try:
-                    os.chmod(bundled, 0o755)
-                    logger.info(f"Granted executable permission to {bundled}")
-                except Exception as e:
-                    logger.warning(f"Failed to chmod {bundled}: {e}")
-            return str(bundled)
             
         return None
 
@@ -196,16 +217,34 @@ class Downloader:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                encoding='utf-8',
-                errors='ignore',
-                bufsize=1,
-                startupinfo=startupinfo
-            )
+            try:
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    encoding='utf-8',
+                    errors='ignore',
+                    bufsize=1,
+                    startupinfo=startupinfo
+                )
+            except OSError as e:
+                # If bundled binary failed (e.g. library mismatch), try system 'aria2c'
+                if os.path.isabs(cmd[0]) and shutil.which("aria2c"):
+                    logger.warning(f"Bundled aria2c failed ({e}), trying system 'aria2c'...")
+                    cmd[0] = "aria2c"
+                    process = subprocess.Popen(
+                        cmd,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        encoding='utf-8',
+                        errors='ignore',
+                        bufsize=1,
+                        startupinfo=startupinfo
+                    )
+                else:
+                    raise e
             
             # Progress regex: [#2b610d 0.9MiB/1.5MiB(58%) CN:1 DL:3.5MiB ETA:1s]
             # Capture percent and DL speed (DL:...)
